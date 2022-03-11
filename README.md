@@ -2,7 +2,7 @@
 [<img src="https://assets.signaloid.io/add-to-signaloid-cloud-logo-light-v6.png#gh-light-mode-only" alt="[Add to signaloid.io]" height="30">](https://signaloid.io/repositories?connect=https://github.com/signaloid/Example-Metallurgy-Brown-Ham-Cutting-Dislocation-Model#gh-light-mode-only)
 
 # Precipitate Dislocation Model from Brown and Ham
-This example shows how uncertainty in empirical model parameters, for a model of a physical process, affect the uncertainty distribution of the model's output. The example implements the equation for a materials precipitate "cutting" dislocation model from Brown and Ham[^0] and shows how metallurgists can gain insight into the uncertainty of a model of a metal alloy's strength. The example highlights how the Signaloid C0 processor allows you to take unmodified programs and track uncertainty through them, getting all the benefits that you would usually only be able to obtain from a hand-crafted (and time-consuming) Monte Carlo evaluation.
+This example shows how uncertainties in empirical model parameters affect the uncertainty distribution of the model's output, for a model of a physical process. The example implements the equation for a materials precipitate "cutting" dislocation model from Brown and Ham[^0] and shows how metallurgists can gain insight into the uncertainty of a model of a metal alloy's strength. The example highlights how the Signaloid C0 processor allows you to take unmodified programs and track uncertainty through them, getting all the benefits that you would usually only be able to obtain from a hand-crafted (and time-consuming) Monte Carlo evaluation.
 
 ## Inputs
 The inputs and their ranges are:
