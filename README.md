@@ -7,7 +7,7 @@ https://user-images.githubusercontent.com/86417/158057589-18e8915d-e5b8-40b8-87a
 <br/>
 
 # Precipitate Dislocation Model from Brown and Ham
-This example shows how uncertainties in empirical model parameters affect the uncertainty distribution of the model's output, for a model of a physical process. The example implements the equation for a materials precipitate "cutting" dislocation model from Brown and Ham[^0] and shows how metallurgists can gain insight into the uncertainty of a model of a metal alloy's strength. The example highlights how the Signaloid C0 processor allows you to take unmodified programs and track uncertainty through them, getting all the benefits that you would usually only be able to obtain from a hand-crafted (and time-consuming) Monte Carlo evaluation.
+This example shows how uncertainties in empirical model parameters affect the uncertainty distribution of the model's output, for a model of a physical process. The example implements the equation for a materials precipitate "cutting" dislocation model from Brown and Ham[^0] and shows how metallurgists can gain insight into the uncertainty of a model of a metal alloy's strength. The example highlights how the Signaloid C0 processor allows you to take unmodified programs and track uncertainty through them[^1], getting all the benefits that you would usually only be able to obtain from a hand-crafted (and time-consuming) Monte Carlo evaluation.
 
 ## Inputs
 The inputs and their ranges are:
@@ -58,3 +58,4 @@ The repository contains three different variants of a simple program implementin
 <br/>
 
 [^0]: Brown, L. M., and R. K. Ham. "Dislocation-particle interactions." Strengthening methods in crystals (1971): 9–135.
+[^1]: Running this example on the Signaloid C0-Cloud processor uses less than 1% of the free monthly credits on the Signaloid C0-Cloud Free Tier plan.
