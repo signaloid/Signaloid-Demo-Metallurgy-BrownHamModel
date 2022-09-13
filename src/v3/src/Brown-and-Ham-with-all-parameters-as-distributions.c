@@ -92,7 +92,7 @@ loadInputs(double *  G, double *  M, double *  Rs, double *  b, double *  gamma,
 int
 main(int argc, char *	argv[])
 {
-	double	G, M, Rs, b, gamma, phi, sigmaC;
+	double	G, M, Rs, b, gamma, phi, sigmaCMpa;
 
 
 	loadInputs(&G, &M, &Rs, &b, &gamma, &phi);
@@ -103,9 +103,9 @@ main(int argc, char *	argv[])
 	 *  σ  = ⎜─────── ⎟ ⋅ ⎜  ╱ ───────────────── - φ⎟
 	 *   c   ⎝2.0 ⋅ b ⎠   ⎝╲╱  π ⋅ G ⋅ pow(b, 2)    ⎠
 	 */
-	sigmaC = ((M*gamma)/(2.0*b))*(sqrt((8.0*gamma*phi*Rs)/(M_PI*G*pow(b, 2))) - phi);
+	sigmaCMpa = ((M*gamma)/(2.0*b))*(sqrt((8.0*gamma*phi*Rs)/(M_PI*G*pow(b, 2))) - phi)/1000000;
 
-	printf("Alloy strength (σc)\t\t= %.1E MPa\n", sigmaC/1000000);
+	printf("Alloy strength (σc)\t\t= %.1E MPa\n", sigmaCMpa);
 
 
 	return 0;
