@@ -48,7 +48,7 @@ The repository contains three different variants of a simple program implementin
 ```
 
 ## Acknowledgements
-We learned about the Brown and Ham model from Prof. Hector Basoalto of the University of Sheffield. We are most grateful to him and his team for guiding us through the ideas and evaluating our initial implementation in this example.
+We learned about the Brown and Ham model from Prof. Hector Basoalto[^2] of the University of Sheffield. We are most grateful to him and his team for guiding us through the ideas and evaluating our initial implementation in this example.
 
 <br/>
 <br/>
@@ -56,3 +56,4 @@ We learned about the Brown and Ham model from Prof. Hector Basoalto of the Unive
 
 [^0]: Brown, L. M., and R. K. Ham. "Dislocation-particle interactions." Strengthening methods in crystals (1971): 9–135.
 [^1]: Running this example on the Signaloid C0-Cloud processor uses less than 1% of the free monthly credits on the Signaloid C0-Cloud Free Tier plan.
+[^2]: M.J. Anderson, F. Schulz, Y. Lu, H.S. Kitaguchi, P. Bowen, C. Argyrakis, and H.C. Basoalto. 2020. On the modelling of precipitation kinetics in a turbine disc nickel based superalloy. Acta Materialia 191 (2020), 81–100. https://doi.org/10.1016/j. actamat.2020.03.058.
