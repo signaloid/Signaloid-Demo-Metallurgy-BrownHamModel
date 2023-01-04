@@ -47,6 +47,8 @@ The repository contains three different variants of a simple program implementin
         └── README.md
 ```
 
+## Acknowledgements
+We learned about the Brown and Ham model from Prof. Hector Basoalto of the University of Sheffield. We are most grateful to him and his team for guiding us through the ideas and evaluating our initial implementation in this example.
 
 <br/>
 <br/>
