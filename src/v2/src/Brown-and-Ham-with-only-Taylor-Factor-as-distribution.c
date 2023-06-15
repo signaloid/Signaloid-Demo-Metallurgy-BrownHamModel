@@ -23,7 +23,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <uncertain.h>
+#include <uxhw.h>
 
 /*
  *	Precipitate "cutting" dislocation model from Brown and Ham
@@ -81,7 +81,7 @@ loadInputs(double *  G, double *  M, double *  Rs, double *  b, double *  gamma,
 						3.1,
 					};
 
-	*M		= libUncertainDoubleDistFromSamples(
+	*M		= UxHwDoubleDistFromSamples(
 								empiricalTaylorFactorValues,
 								sizeof(empiricalTaylorFactorValues)/sizeof(double)
 							);

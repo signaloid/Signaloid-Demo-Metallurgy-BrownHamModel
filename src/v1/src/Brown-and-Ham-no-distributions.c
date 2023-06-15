@@ -23,7 +23,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <uncertain.h>
+#include <uxhw.h>
 
 /*
  *	Precipitate "cutting" dislocation model from Brown and Ham

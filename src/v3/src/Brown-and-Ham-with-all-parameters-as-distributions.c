@@ -23,7 +23,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <uncertain.h>
+#include <uxhw.h>
 
 /*
  *	Precipitate "cutting" dislocation model from Brown and Ham
@@ -81,12 +81,12 @@ loadInputs(double *  G, double *  M, double *  Rs, double *  b, double *  gamma,
 						3.1,
 					};
 
-	*M		= libUncertainDoubleDistFromSamples(empiricalTaylorFactorValues, sizeof(empiricalTaylorFactorValues)/sizeof(double));
-	*G		= libUncertainDoubleUniformDist(6E10, 8E10);
-	*Rs		= libUncertainDoubleMixture(libUncertainDoubleGaussDist(1E-8, 2E-9), libUncertainDoubleGaussDist(3E-8, 2E-9), 0.5);
+	*M		= UxHwDoubleDistFromSamples(empiricalTaylorFactorValues, sizeof(empiricalTaylorFactorValues)/sizeof(double));
+	*G		= UxHwDoubleUniformDist(6E10, 8E10);
+	*Rs		= UxHwDoubleMixture(UxHwDoubleGaussDist(1E-8, 2E-9), UxHwDoubleGaussDist(3E-8, 2E-9), 0.5);
 	*b		= 2.54E-10;
-	*gamma	= libUncertainDoubleUniformDist(0.15, 0.25);
-	*phi	= libUncertainDoubleUniformDist(0.3, 0.45);
+	*gamma	= UxHwDoubleUniformDist(0.15, 0.25);
+	*phi	= UxHwDoubleUniformDist(0.3, 0.45);
 }
 
 int
