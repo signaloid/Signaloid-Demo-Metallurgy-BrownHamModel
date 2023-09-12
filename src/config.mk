@@ -1,1 +1,1 @@
-SOURCES		= Brown-and-Ham-no-distributions.c
+SOURCES		= Brown-and-Ham-with-all-parameters-as-distributions.c
