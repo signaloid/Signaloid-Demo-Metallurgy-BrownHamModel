@@ -73,10 +73,11 @@ The parameter `gamma` is the APB energy with units J/m^2, `phi` is the precipita
 
 ## Outputs
 The output is the cutting stress, $\sigma_c$, where
-$$
+
+```math
 \sigma_c = \left( \frac{M \cdot \gamma}{2.0 \cdot b} \right) \cdot
 \left( \sqrt{\frac{8.0 \cdot \gamma \cdot \phi \cdot Rs}{\pi \cdot G \cdot b^2}} - \phi \right).
-$$
+```
 
 Following is an example output, using Signaloid's C0Pro-XS+ core, for the default inputs:
 
