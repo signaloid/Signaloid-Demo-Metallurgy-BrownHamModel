@@ -1,1 +1,4 @@
-SOURCES		= Brown-and-Ham-with-all-parameters-as-distributions.c
+SOURCES =\
+	main.c\
+	utilities.c\
+	common.c
