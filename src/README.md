@@ -1,8 +1,22 @@
 # Source code
 
 ## `main.c`
-The implementation of the materials precipitate "cutting" dislocation model from
-Brown and Ham.
+Parses command-line arguments, resolves the model's inputs (from the command
+line, their defaults, or an input CSV file), dispatches to the UxHw or Monte
+Carlo calculation kernel, and reports the result.
+
+## `kernel.c/h`
+Contains `computeBrownHamModelOutput()`, the Brown and Ham precipitate
+"cutting" dislocation model formula shared by both modes, and the two
+mode-dispatch kernels `calculateOutputUxHw()` and `calculateOutputMonteCarlo()`.
+
+## `brown-and-ham-uxhw.c/h`
+The UxHw-mode kernel: evaluates the model once on a single, already-resolved
+set of (possibly distributional) inputs.
+
+## `brown-and-ham-monte-carlo.c/h`
+The Monte Carlo-mode kernel: evaluates the model once per Monte Carlo
+iteration, drawing a fresh sample of any input not pinned by the command line.
 
 ## `utilities.c/h`
 These contain utility methods for parsing, setting, and reporting
@@ -36,13 +50,12 @@ Signaloid cores use this file to identify the source codes they will use when
 building the C/C++ demo application.
 
 # To Build Natively on Non-Signaloid Platforms
-
-## On MacOS (with MacPorts)
+From the repository root, run:
 ```
-gcc -I. -I/opt/local/include main.c utilities.c common.c uxhw.c -L/opt/local/lib -lgsl -lgslcblas
+make local-build
 ```
-
-## On Linux
-```
-gcc -I. -I/opt/local/include main.c utilities.c common.c uxhw.c -L/opt/local/lib -lgsl -lgslcblas -lm
-```
+This builds the demo against the host toolchain and the UxHw compatibility
+shim in `submodules/compat` (see the top-level [`Makefile`](../Makefile)),
+producing the `demo-native-mc` binary in the repository root. See the
+[Prerequisites](../README.md#prerequisites) section of the root `README.md` for
+installing the build dependencies on macOS and Linux.

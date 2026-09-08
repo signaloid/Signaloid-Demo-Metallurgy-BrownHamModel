@@ -6,23 +6,14 @@ MinimumCore:
 
 TraceVariables:
   - File: "main.c"
-    LineNumber: 93
-    Expression: "gamma"
-  - File: "main.c"
-    LineNumber: 94
-    Expression: "phi"
-  - File: "main.c"
-    LineNumber: 95
-    Expression: "Rs"
-  - File: "main.c"
-    LineNumber: 96
-    Expression: "G"
-  - File: "main.c"
-    LineNumber: 97
-    Expression: "b"
-  - File: "main.c"
-    LineNumber: 98
-    Expression: "M"
-  - File: "main.c"
-    LineNumber: 99
-    Expression: "sigmaCMpa"
+    LineNumber: 73
+    Expression: "outputVariables[0]"
+
+BenchmarkingVariables:
+    - VariableName: sigmaCMpa
+      VariableDescription: Cutting stress
+      OutputObject: Distribution
+      CommandLineArguments: " "
+
+BenchmarkingAllOutputs:
+    - CommandLineArguments: " "

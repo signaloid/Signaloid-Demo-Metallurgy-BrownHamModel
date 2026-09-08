@@ -1,5 +1,5 @@
 /*
- *	Copyright (c) 2022–2024, Signaloid.
+ *	Copyright (c) 2024-2026, Signaloid.
  *
  *	Permission is hereby granted, free of charge, to any person obtaining a copy
  *	of this software and associated documentation files (the "Software"), to deal
@@ -20,42 +20,15 @@
  *	SOFTWARE.
  */
 
-#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
+#include <inttypes.h>
 #include <uxhw.h>
 #include "utilities.h"
+#include "kernel.h"
 #include "common.h"
-
-
-/**
- *	@brief	Computes the output of the precipitate dislocation model from Brown and Ham.
- *
- *	@param	gamma	: `gamma` variable.
- *	@param	phi	: `phi` variable.
- *	@param	Rs	: `Rs` variable.
- *	@param	G	: `G` variable.
- *	@param	b	: `b` variable.
- *	@param	M	: `M` variable.
- *	@return		: The output of the precipitate dislocation model from Brown and Ham.
- */
-static double
-computeBrownHamModelOutput(
-	double	gamma,
-	double	phi,
-	double	Rs,
-	double	G,
-	double	b,
-	double	M)
-{
-	/*
-	 *                    ⎛    _________________    ⎞
-	 *       ⎛ M ⋅ γ  ⎞   ⎜   ╱8.0 ⋅ γ ⋅ φ ⋅ Rs     ⎟
-	 *  σ  = ⎜─────── ⎟ ⋅ ⎜  ╱ ───────────────── - φ⎟
-	 *   c   ⎝2.0 ⋅ b ⎠   ⎝╲╱  π ⋅ G ⋅ pow(b, 2)    ⎠
-	 */
-	return ((M * gamma) / (2.0 * b))*(sqrt((8.0 * gamma * phi * Rs) / (M_PI * G * pow(b, 2))) - phi) / 1000000;
-}
 
 /*
  *	Precipitate "cutting" dislocation model from Brown and Ham
@@ -89,24 +62,24 @@ computeBrownHamModelOutput(
 int
 main(int argc, char *  argv[])
 {
-	CommandLineArguments	arguments;
-	double			gamma;
-	double			phi;
-	double			Rs;
-	double			G;
-	double			b;
-	double			M;
-	double			sigmaCMpa;
-	double			inputDistributions[kInputDistributionIndexMax];
-	const char * const	outputVariableNames[kOutputDistributionIndexMax] = {"sigmaCMpa"};
-	const char * const	inputVariableNames[kInputDistributionIndexMax] = {"b", "G", "gamma", "M", "phi", "Rs"};
-	double			outputVariables[kOutputDistributionIndexMax];
-	clock_t			start;
-	clock_t			end;
-	double			cpuTimeUsedInSeconds;
-	double			benchmarkOutput;
-	double *		monteCarloOutputSamples = NULL;
-	MeanAndVariance		monteCarloOutputMeanAndVariance = {0};
+	CommandLineArguments        arguments;
+	double                      output;
+	double *                    monteCarloOutputSamples = NULL;
+	clock_t                     start;
+	clock_t                     end;
+	double                      cpuTimeUsedInSeconds    = 0.0;
+	double                      benchmarkOutput         = 0.0;
+	double                      inputDistributions[kInputDistributionIndexMax];
+	double                      outputVariables[kOutputDistributionIndexMax];
+	const char *                applicationDescription = "Precipitate cutting dislocation model from Brown and Ham";
+	const char *const           inputVariableNames[kInputDistributionIndexMax]      = { "b", "G", "gamma", "M", "phi", "Rs" };
+	const char *const           outputVariableNames[kOutputDistributionIndexMax]    = {
+		[kOutputDistributionIndexSigma] = "sigmaCMpa",
+	};
+	kOutputVariableTypeIndex    outputVariableTypes[kOutputDistributionIndexMax] = {
+		[kOutputDistributionIndexSigma] = kOutputVariableTypeDistribution,
+	};
+	MeanAndVariance             meanAndVariance = { 0 };
 
 	/*
 	 *	Get command-line arguments.
@@ -117,30 +90,37 @@ main(int argc, char *  argv[])
 	}
 
 	/*
-	 *	Read input distributions from CSV if input from file is enabled.
+	 *	Read input distributions from CSV if input from file is enabled. This
+	 *	overwrites `arguments`' `gamma`/`phi`/`Rs`/`G`/`b`/`M` fields with the
+	 *	CSV-derived values; input-from-file is not compatible with Monte Carlo
+	 *	mode (rejected above, in `getCommandLineArguments()`), so only the
+	 *	UxHw kernel ever sees them.
 	 */
 	if (arguments.common.isInputFromFileEnabled)
 	{
-		if(readInputDoubleDistributionsFromCSV(
-			arguments.common.inputFilePath,
-			inputVariableNames,
-			inputDistributions,
-			kInputDistributionIndexMax))
+		if (readInputDoubleDistributionsFromCSV(
+				arguments.common.inputFilePath,
+				inputVariableNames,
+				inputDistributions,
+				kInputDistributionIndexMax
+		))
 		{
 			return EXIT_FAILURE;
 		}
+
+		loadInputs(inputDistributions, &arguments);
 	}
 
 	/*
-	 *	Allocate for monteCarloOutputSamples if in Monte Carlo mode.
+	 *	MonteCarlo output samples are used even in the UxHw use case to store
+	 *	the result of the single computed sample.
 	 */
-	if (arguments.common.isMonteCarloMode)
-	{
-		monteCarloOutputSamples = (double *) checkedMalloc(
-								arguments.common.numberOfMonteCarloIterations * sizeof(double),
-								__FILE__,
-								__LINE__);
-	}
+	monteCarloOutputSamples =
+		(double *) checkedMalloc(
+			arguments.common.numberOfMonteCarloIterations * sizeof(double),
+			__FILE__,
+			__LINE__
+		);
 
 	/*
 	 *	Start timing.
@@ -151,77 +131,38 @@ main(int argc, char *  argv[])
 	}
 
 	/*
-	 *	Execute process kernel in a loop. The size of loop is 1 unless in Monte Carlo mode.
+	 *	Dispatch to the mode-specific kernel. The Monte Carlo loop (when
+	 *	applicable) lives inside `calculateOutputMonteCarlo`; UxHw mode runs a
+	 *	single distributional evaluation inside `calculateOutputUxHw`.
 	 */
-	for (size_t i = 0; i < arguments.common.numberOfMonteCarloIterations; ++i)
-	{
-		/*
-		 *	Load inputs.
-		 */
-		loadInputs(
-			&gamma,
-			&phi,
-			&Rs,
-			&G,
-			&b,
-			&M,
-			inputDistributions,
-			&arguments);
+	bool isSelectedOutputScalar = (arguments.common.outputSelect != kOutputDistributionIndexMax) &&
+	                              (outputVariableTypes[arguments.common.outputSelect] == kOutputVariableTypeScalar);
 
-		/*
-		 *	Print inputs if in verbose mode.
-		 */
-		if (arguments.common.isVerbose)
-		{
-			printf("Anti-phase boundary energy (γ)\t\t= %le J/m^2\n", gamma);
-			printf("Precipitate volume fraction (φ)\t\t= %le\n", phi);
-			printf("Mean particle radius on plane (Rs)\t\t= %le m\n", Rs);
-			printf("Shear modulus (G)\t\t= %le Pa\n", G);
-			printf("Magnitude of the Burger's vector (b)\t\t= %le m\n", b);
-			printf("Taylor factor (M)\t\t= %le\n", M);
-		}
-
-		/*
-		 *	Compute the cutting stress predicted by the Brown-Ham Model.
-		 */
-		sigmaCMpa = computeBrownHamModelOutput(
-				gamma,
-				phi,
-				Rs,
-				G,
-				b,
-				M);
-
-		/*
-		 *	If in Monte Carlo mode, populate monteCarloOutputSamples
-		 */
-		if (arguments.common.isMonteCarloMode)
-		{
-			monteCarloOutputSamples[i] = sigmaCMpa;
-		}
-		/*
-		 *	Else, if in benchmarking mode, populate benchmarkOutput.
-		 */
-		else if (arguments.common.isBenchmarkingMode)
-		{
-			benchmarkOutput = sigmaCMpa;
-		}
-	}
-
-	/*
-	 *	If not doing Laplace version, then approximate the cost of the third phase of
-	 *	Monte Carlo (post-processing), by calculating the mean and variance.
-	 */
 	if (arguments.common.isMonteCarloMode)
 	{
-		monteCarloOutputMeanAndVariance = calculateMeanAndVarianceOfDoubleSamples(
-								monteCarloOutputSamples,
-								arguments.common.numberOfMonteCarloIterations);
-		benchmarkOutput = monteCarloOutputMeanAndVariance.mean;
+		output = calculateOutputMonteCarlo(&arguments, outputVariables, monteCarloOutputSamples);
+
+		/*
+		 *	If not doing UxHw version, then approximate the cost of the third phase of
+		 *	Monte Carlo (post-processing), by calculating the mean and variance.
+		 *	For scalar outputs, the kernel has already written the correct value to
+		 *	`outputVariables[outputSelect]`; the sample buffer holds only a single sample
+		 *	at index 0, so the mean would be meaningless. This demo has no scalar outputs,
+		 *	so this branch always runs in Monte Carlo mode.
+		 */
+		if (!isSelectedOutputScalar)
+		{
+			meanAndVariance = calculateMeanAndVarianceOfDoubleSamples(monteCarloOutputSamples, arguments.common.numberOfMonteCarloIterations);
+			output          = outputVariables[arguments.common.outputSelect] = meanAndVariance.mean;
+		}
+	}
+	else
+	{
+		output = calculateOutputUxHw(&arguments, outputVariables, monteCarloOutputSamples);
 	}
 
 	/*
-	 *	Stop timing and evaluate timing result.
+	 *	Stop timing.
 	 */
 	if (arguments.common.isTimingEnabled || arguments.common.isBenchmarkingMode)
 	{
@@ -229,10 +170,7 @@ main(int argc, char *  argv[])
 		cpuTimeUsedInSeconds = ((double) (end - start)) / CLOCKS_PER_SEC;
 	}
 
-	/*
-	 *	Set outputs.
-	 */
-	outputVariables[kOutputDistributionIndexSigma] = sigmaCMpa;
+	benchmarkOutput = output;
 
 	/*
 	 *	If in benchmarking mode, print timing result in a special format:
@@ -241,26 +179,45 @@ main(int argc, char *  argv[])
 	 */
 	if (arguments.common.isBenchmarkingMode)
 	{
-		printf("%lf %" PRIu64 "\n", benchmarkOutput, (uint64_t)(cpuTimeUsedInSeconds * 1000000));
+		printf("%lf %" PRIu64 "\n", benchmarkOutput, (uint64_t) (cpuTimeUsedInSeconds * 1000000));
 	}
 	else
 	{
+		/*
+		 *	For scalar outputs in Monte Carlo mode, present a copy of the args with MC
+		 *	disabled and iterations=1 so the common print routines take their scalar
+		 *	code paths instead of computing distribution stats over a one-element buffer.
+		 *	This demo has no scalar outputs, so `printArguments` is always identical to
+		 *	`arguments.common`.
+		 */
+		CommonCommandLineArguments printArguments = arguments.common;
+
+		if (arguments.common.isMonteCarloMode && isSelectedOutputScalar)
+		{
+			printArguments.isMonteCarloMode             = false;
+			printArguments.numberOfMonteCarloIterations = 1;
+		}
+
 		/*
 		 *	Print json outputs if in JSON output mode.
 		 */
 		if (arguments.common.isOutputJSONMode)
 		{
 			printJSONFormattedOutput(
-				sigmaCMpa,
-				cpuTimeUsedInSeconds,
-				&arguments);
+				&printArguments,
+				monteCarloOutputSamples,
+				outputVariables,
+				outputVariableNames,
+				kOutputDistributionIndexMax,
+				applicationDescription
+			);
 		}
 		/*
 		 *	Else print human-consumable output.
 		 */
 		else
 		{
-			printf("Cutting stress (σc) = %le MPa\n", sigmaCMpa);
+			printf("Cutting stress (σc) = %le MPa\n", outputVariables[kOutputDistributionIndexSigma]);
 		}
 
 		/*
@@ -273,14 +230,19 @@ main(int argc, char *  argv[])
 	}
 
 	/*
-	 *	Save Monte Carlo data to "data.out" if in Monte Carlo mode.
+	 *	Save Monte Carlo outputs in an output file.
 	 */
 	if (arguments.common.isMonteCarloMode)
 	{
+		size_t samplesToSave = isSelectedOutputScalar
+		                ? 1
+		                : arguments.common.numberOfMonteCarloIterations;
+
 		saveMonteCarloDoubleDataToDataDotOutFile(
 			monteCarloOutputSamples,
-			(uint64_t)(cpuTimeUsedInSeconds * 1000000),
-			arguments.common.numberOfMonteCarloIterations);
+			(uint64_t) (cpuTimeUsedInSeconds * 1000000),
+			samplesToSave
+		);
 	}
 	/*
 	 *	Save outputs to file if not in Monte Carlo mode and write to file is enabled.
@@ -289,13 +251,15 @@ main(int argc, char *  argv[])
 	{
 		if (arguments.common.isWriteToFileEnabled)
 		{
-			if(writeOutputDoubleDistributionsToCSV(
-				arguments.common.outputFilePath,
-				outputVariables,
-				outputVariableNames,
-				kOutputDistributionIndexMax))
+			if (writeOutputDoubleDistributionsToCSV(
+					arguments.common.outputFilePath,
+					outputVariables,
+					outputVariableNames,
+					kOutputDistributionIndexMax
+			))
 			{
 				fprintf(stderr, "Error: Could not write to output CSV file \"%s\".\n", arguments.common.outputFilePath);
+				free(monteCarloOutputSamples);
 
 				return EXIT_FAILURE;
 			}
@@ -303,12 +267,9 @@ main(int argc, char *  argv[])
 	}
 
 	/*
-	 *	Free allocations.
+	 *	Free dynamically-allocated memory.
 	 */
-	if (arguments.common.isMonteCarloMode)
-	{
-		free(monteCarloOutputSamples);
-	}
+	free(monteCarloOutputSamples);
 
 	return EXIT_SUCCESS;
 }

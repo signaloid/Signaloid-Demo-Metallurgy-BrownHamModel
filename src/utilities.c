@@ -39,7 +39,8 @@ printUsage(void)
 	fprintf(stderr, "Example: Precipitate Dislocation Model from Brown and Ham - Signaloid version\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Usage: Valid command-line arguments are:\n");
-	fprintf(stderr,
+	fprintf(
+		stderr,
 		"\t[-o, --output <Path to output CSV file : str>] (Specify the output file.)\n"
 		"\t[-M, --multiple-executions <Number of executions : int> (Default: 1)] (Repeated execute kernel for benchmarking.)\n"
 		"\t[-T, --time] (Timing mode: Times and prints the timing of the kernel execution.)\n"
@@ -48,8 +49,10 @@ printUsage(void)
 		"\t[-j, --json] (Print output in JSON format.)\n"
 		"\t[-h, --help] (Display this help message.)\n"
 		"\t[-g, --apb-energy <gamma: double> (Default: Uniform(%"SignaloidParticleModifier".2lf, %"SignaloidParticleModifier".2lf))] (Set `gamma` variable.)\n"
-		"\t[-p, --precipitate-volume-fraction <phi: double> (Default: Uniform(%"SignaloidParticleModifier".2lf, %"SignaloidParticleModifier".2lf))] (Set `phi` variable.)\n"
-		"\t[-R, --mean-particle-radius <Rs: double> (Default: UxHwDoubleMixture(Gauss(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier".1le), Gauss(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier".1le), %"SignaloidParticleModifier".1lf))] (Set `Rs` variable.)\n"
+		"\t[-p, --precipitate-volume-fraction <phi: double> (Default: Uniform(%"SignaloidParticleModifier".2lf, %"SignaloidParticleModifier
+		".2lf))] (Set `phi` variable.)\n"
+		"\t[-R, --mean-particle-radius <Rs: double> (Default: UxHwDoubleMixture(Gauss(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier
+		".1le), Gauss(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier".1le), %"SignaloidParticleModifier".1lf))] (Set `Rs` variable.)\n"
 		"\t[-G, --shear-modulus <G: double> (Default: Uniform(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier".1le))] (Set `G` variable.)\n"
 		"\t[-B, --burgers-vector <b: double> (Default: %"SignaloidParticleModifier".2le)] (Set `b` variable.)\n"
 		"\t[-m, --taylor-factor <M: double> (Default: Uniform(%"SignaloidParticleModifier".1lf, %"SignaloidParticleModifier".1lf))] (Set `M` variable.)\n",
@@ -66,14 +69,15 @@ printUsage(void)
 		kDemoSpecificConstantGUniformMax,
 		kDemoSpecificConstantB,
 		kDemoSpecificConstantMUniformMin,
-		kDemoSpecificConstantMUniformMax);
+		kDemoSpecificConstantMUniformMax
+	);
 	fprintf(stderr, "\n");
 
 	return;
 }
 
 CommonConstantReturnType
-setDefaultCommandLineArguments(CommandLineArguments *	arguments)
+setDefaultCommandLineArguments(CommandLineArguments * arguments)
 {
 	if (arguments == NULL)
 	{
@@ -94,16 +98,17 @@ setDefaultCommandLineArguments(CommandLineArguments *	arguments)
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 
 	*arguments = (CommandLineArguments) {
-		.common			= (CommonCommandLineArguments) {0},
-		.gamma			= UxHwDoubleUniformDist(kDemoSpecificConstantGammaUniformMin, kDemoSpecificConstantGammaUniformMax),
-		.phi			= UxHwDoubleUniformDist(kDemoSpecificConstantPhiUniformMin, kDemoSpecificConstantPhiUniformMax),
-		.Rs 			= UxHwDoubleMixture(
-						UxHwDoubleGaussDist(kDemoSpecificConstantRsMixtureFirstGaussianMean, kDemoSpecificConstantRsMixtureFirstGaussianStandardDeviation),
-						UxHwDoubleGaussDist(kDemoSpecificConstantRsMixtureSecondGaussianMean, kDemoSpecificConstantRsMixtureSecondGaussianStandardDeviation),
-						kDemoSpecificConstantRsMixtureFirstGaussianWeight),
-		.G			= UxHwDoubleUniformDist(kDemoSpecificConstantGUniformMin, kDemoSpecificConstantGUniformMax),
-		.b			= kDemoSpecificConstantB,
-		.M			= UxHwDoubleUniformDist(kDemoSpecificConstantMUniformMin, kDemoSpecificConstantMUniformMax),
+		.common = (CommonCommandLineArguments) { 0 },
+		.gamma  = UxHwDoubleUniformDist(kDemoSpecificConstantGammaUniformMin, kDemoSpecificConstantGammaUniformMax),
+		.phi    = UxHwDoubleUniformDist(kDemoSpecificConstantPhiUniformMin, kDemoSpecificConstantPhiUniformMax),
+		.Rs     = UxHwDoubleMixture(
+			UxHwDoubleGaussDist(kDemoSpecificConstantRsMixtureFirstGaussianMean, kDemoSpecificConstantRsMixtureFirstGaussianStandardDeviation),
+			UxHwDoubleGaussDist(kDemoSpecificConstantRsMixtureSecondGaussianMean, kDemoSpecificConstantRsMixtureSecondGaussianStandardDeviation),
+			kDemoSpecificConstantRsMixtureFirstGaussianWeight
+		          ),
+		.G  = UxHwDoubleUniformDist(kDemoSpecificConstantGUniformMin, kDemoSpecificConstantGUniformMax),
+		.b  = kDemoSpecificConstantB,
+		.M  = UxHwDoubleUniformDist(kDemoSpecificConstantMUniformMin, kDemoSpecificConstantMUniformMax),
 	};
 
 	return kCommonConstantReturnTypeSuccess;
@@ -112,13 +117,13 @@ setDefaultCommandLineArguments(CommandLineArguments *	arguments)
 CommonConstantReturnType
 getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  arguments)
 {
-	const char *	gammaArg = NULL;
-	const char *	phiArg = NULL;
-	const char *	RsArg = NULL;
-	const char *	GArg = NULL;
-	const char *	bArg = NULL;
-	const char *	MArg = NULL;
-	const char	kConstantStringUx[] = "Ux";
+	const char *    gammaArg            = NULL;
+	const char *    phiArg              = NULL;
+	const char *    RsArg               = NULL;
+	const char *    GArg                = NULL;
+	const char *    bArg                = NULL;
+	const char *    MArg                = NULL;
+	const char      kConstantStringUx[] = "Ux";
 
 	if (arguments == NULL)
 	{
@@ -133,13 +138,13 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 	}
 
 	DemoOption options[] = {
-		{ .opt = "g", .optAlternative = "apb-energy", .hasArg = true,.foundArg = &gammaArg,	.foundOpt = NULL },
-		{ .opt = "p", .optAlternative = "precipitate-volume-fraction", .hasArg = true,.foundArg = &phiArg,	.foundOpt = NULL },
-		{ .opt = "R", .optAlternative = "mean-particle-radius", .hasArg = true,.foundArg = &RsArg,	.foundOpt = NULL },
-		{ .opt = "G", .optAlternative = "shear-modulus", .hasArg = true,.foundArg = &GArg,		.foundOpt = NULL },
-		{ .opt = "B", .optAlternative = "burgers-vector", .hasArg = true,.foundArg = &bArg,		.foundOpt = NULL },
-		{ .opt = "m", .optAlternative = "taylor-factor", .hasArg = true,.foundArg = &MArg,		.foundOpt = NULL },
-		{0},
+		{ .opt = "g", .optAlternative = "apb-energy",                  .hasArg = true, .foundArg = &gammaArg, .foundOpt = NULL },
+		{ .opt = "p", .optAlternative = "precipitate-volume-fraction", .hasArg = true, .foundArg = &phiArg,   .foundOpt = NULL },
+		{ .opt = "R", .optAlternative = "mean-particle-radius",        .hasArg = true, .foundArg = &RsArg,    .foundOpt = NULL },
+		{ .opt = "G", .optAlternative = "shear-modulus",               .hasArg = true, .foundArg = &GArg,     .foundOpt = NULL },
+		{ .opt = "B", .optAlternative = "burgers-vector",              .hasArg = true, .foundArg = &bArg,     .foundOpt = NULL },
+		{ .opt = "m", .optAlternative = "taylor-factor",               .hasArg = true, .foundArg = &MArg,     .foundOpt = NULL },
+		{ 0 },
 	};
 
 	if (parseArgs(argc, argv, &arguments->common, options) != kCommonConstantReturnTypeSuccess)
@@ -195,7 +200,8 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 			return kCommonConstantReturnTypeError;
 		}
 
-		arguments->gamma = gamma;
+		arguments->gamma                = gamma;
+		arguments->isGammaOverridden    = true;
 	}
 
 	if (phiArg != NULL)
@@ -222,7 +228,8 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 			return kCommonConstantReturnTypeError;
 		}
 
-		arguments->phi = phi;
+		arguments->phi              = phi;
+		arguments->isPhiOverridden  = true;
 	}
 
 	if (RsArg != NULL)
@@ -249,7 +256,8 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 			return kCommonConstantReturnTypeError;
 		}
 
-		arguments->Rs = Rs;
+		arguments->Rs               = Rs;
+		arguments->isRsOverridden   = true;
 	}
 
 	if (GArg != NULL)
@@ -276,7 +284,8 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 			return kCommonConstantReturnTypeError;
 		}
 
-		arguments->G = G;
+		arguments->G                = G;
+		arguments->isGOverridden    = true;
 	}
 
 	if (bArg != NULL)
@@ -330,7 +339,8 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 			return kCommonConstantReturnTypeError;
 		}
 
-		arguments->M = M;
+		arguments->M                = M;
+		arguments->isMOverridden    = true;
 	}
 
 	return kCommonConstantReturnTypeSuccess;
@@ -338,76 +348,17 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 
 void
 loadInputs(
-	double *		gamma,
-	double *		phi,
-	double *		Rs,
-	double *		G,
-	double *		b,
-	double *		M,
-	double *		inputDistributions,
-	CommandLineArguments *	arguments)
+	double *                inputDistributions,
+	CommandLineArguments *  arguments)
 {
 	if (arguments->common.isInputFromFileEnabled)
 	{
-		*b	= inputDistributions[kInputDistributionIndexB];
-		*G	= inputDistributions[kInputDistributionIndexG];
-		*gamma	= inputDistributions[kInputDistributionIndexGamma];
-		*M	= inputDistributions[kInputDistributionIndexM];
-		*phi	= inputDistributions[kInputDistributionIndexPhi];
-		*Rs	= inputDistributions[kInputDistributionIndexRs];
-	}
-	else
-	{
-		*b	= arguments->b;
-		*G	= arguments->G;
-		*gamma	= arguments->gamma;
-		*M	= arguments->M;
-		*phi	= arguments->phi;
-		*Rs	= arguments->Rs;
-	}
-
-	return;
-}
-
-void
-printJSONFormattedOutput(
-	double			sigmaCMpa,
-	double			cpuTimeUsedInSeconds,
-	CommandLineArguments *	arguments)
-{
-	if (arguments->common.isTimingEnabled)
-	{
-		JSONVariable variables[2] = {
-			{
-				.variableSymbol = "sigmaCMpa",
-				.variableDescription = "Cutting stress (σc)",
-				.values = (JSONVariablePointer) { .asDouble = &sigmaCMpa},
-				.type = kJSONVariableTypeDouble,
-				.size = 1,
-			},
-			{
-				.variableSymbol = "cpuTimeUsed",
-				.variableDescription = "CPU time used (s)",
-				.values = (JSONVariablePointer) { .asDouble = &cpuTimeUsedInSeconds},
-				.type = kJSONVariableTypeDoubleParticle,
-				.size = 1,
-			}
-		};
-
-		printJSONVariables(variables, 2, "Precipitate \\\"cutting\\\" dislocation model from Brown and Ham");
-	}
-	else
-	{
-		JSONVariable variables[1] = {
-			{
-				.variableSymbol = "sigmaCMpa",
-				.variableDescription = "Cutting stress (σc)",
-				.values = (JSONVariablePointer) { .asDouble = &sigmaCMpa},
-				.type = kJSONVariableTypeDouble,
-				.size = 1,
-			}
-		};
-		printJSONVariables(variables, 1, "Precipitate \\\"cutting\\\" dislocation model from Brown and Ham");
+		arguments->b        = inputDistributions[kInputDistributionIndexB];
+		arguments->G        = inputDistributions[kInputDistributionIndexG];
+		arguments->gamma    = inputDistributions[kInputDistributionIndexGamma];
+		arguments->M        = inputDistributions[kInputDistributionIndexM];
+		arguments->phi      = inputDistributions[kInputDistributionIndexPhi];
+		arguments->Rs       = inputDistributions[kInputDistributionIndexRs];
 	}
 
 	return;
