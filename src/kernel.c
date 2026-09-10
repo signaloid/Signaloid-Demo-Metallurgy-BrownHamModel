@@ -88,7 +88,7 @@ brownHamModelMonteCarloSample(CommandLineArguments * arguments)
 
 	/*
 	 *	Inputs pinned by the command line stay fixed across every Monte
-	 *	Carlo iteration; free inputs are redrawn from their default
+	 *	Carlo iteration and free inputs are redrawn from their default
 	 *	distributions on every call, mirroring `setDefaultCommandLineArguments()`.
 	 */
 	gamma = arguments->isGammaOverridden

@@ -92,7 +92,7 @@ main(int argc, char *  argv[])
 	/*
 	 *	Read input distributions from CSV if input from file is enabled. This
 	 *	overwrites `arguments`' `gamma`/`phi`/`Rs`/`G`/`b`/`M` fields with the
-	 *	CSV-derived values; input-from-file is not compatible with Monte Carlo
+	 *	CSV-derived values. Input-from-file is not compatible with Monte Carlo
 	 *	mode (rejected above, in `getCommandLineArguments()`), so only the
 	 *	UxHw kernel ever sees them.
 	 */
@@ -132,7 +132,7 @@ main(int argc, char *  argv[])
 
 	/*
 	 *	Dispatch to the mode-specific kernel. The Monte Carlo loop (when
-	 *	applicable) lives inside `calculateOutputMonteCarlo`; UxHw mode runs a
+	 *	applicable) lives inside `calculateOutputMonteCarlo`. UxHw mode runs a
 	 *	single distributional evaluation inside `calculateOutputUxHw`.
 	 */
 	bool isSelectedOutputScalar = (arguments.common.outputSelect != kOutputDistributionIndexMax) &&
@@ -145,10 +145,6 @@ main(int argc, char *  argv[])
 		/*
 		 *	If not doing UxHw version, then approximate the cost of the third phase of
 		 *	Monte Carlo (post-processing), by calculating the mean and variance.
-		 *	For scalar outputs, the kernel has already written the correct value to
-		 *	`outputVariables[outputSelect]`; the sample buffer holds only a single sample
-		 *	at index 0, so the mean would be meaningless. This demo has no scalar outputs,
-		 *	so this branch always runs in Monte Carlo mode.
 		 */
 		if (!isSelectedOutputScalar)
 		{
