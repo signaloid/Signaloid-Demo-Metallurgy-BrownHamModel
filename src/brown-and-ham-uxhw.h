@@ -1,0 +1,48 @@
+/*
+ *	Copyright (c) 2024-2026, Signaloid.
+ *
+ *	Permission is hereby granted, free of charge, to any person obtaining a copy
+ *	of this software and associated documentation files (the "Software"), to deal
+ *	in the Software without restriction, including without limitation the rights
+ *	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *	copies of the Software, and to permit persons to whom the Software is
+ *	furnished to do so, subject to the following conditions:
+ *
+ *	The above copyright notice and this permission notice shall be included in all
+ *	copies or substantial portions of the Software.
+ *
+ *	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *	SOFTWARE.
+ */
+
+#pragma once
+
+/**
+ *	@brief	Calculate and return the distribution of the cutting stress using
+ *		distributional arithmetic on a single, already-resolved set of
+ *		model inputs. `gamma`, `phi`, `Rs`, `G`, and `M` may each be a full
+ *		Signaloid Ux-tagged distribution (from a default `UxHwDoubleUniformDist`
+ *		/ `UxHwDoubleMixture` draw or from an input CSV file) or a plain
+ *		scalar (from an explicit command-line override).
+ *
+ *	@param	gamma	: Anti-phase boundary energy (APB energy), units J/m^2.
+ *	@param	phi	: Precipitate volume fraction.
+ *	@param	Rs	: Mean particle radius on plane, units m.
+ *	@param	G	: Shear modulus, units Pa.
+ *	@param	b	: Magnitude of the Burgers vector, units m.
+ *	@param	M	: Taylor factor.
+ *	@return	double	: Returns the distribution of the cutting stress, `σc`.
+ */
+double
+computeSigmaUxHw(
+	double  gamma,
+	double  phi,
+	double  Rs,
+	double  G,
+	double  b,
+	double  M);
