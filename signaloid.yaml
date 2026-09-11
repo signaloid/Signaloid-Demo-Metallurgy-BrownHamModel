@@ -10,7 +10,7 @@ TraceVariables:
     Expression: "outputVariables[0]"
 
 BenchmarkingVariables:
-    - VariableName: sigmaCMpa
+    - VariableName: outputVariables[0]
       VariableDescription: Cutting stress
       OutputObject: Distribution
       CommandLineArguments: " "
