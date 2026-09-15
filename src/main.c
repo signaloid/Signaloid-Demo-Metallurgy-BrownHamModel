@@ -73,8 +73,11 @@ main(int argc, char *  argv[])
 	double                      outputVariables[kOutputDistributionIndexMax];
 	const char *                applicationDescription = "Precipitate cutting dislocation model from Brown and Ham";
 	const char *const           inputVariableNames[kInputDistributionIndexMax]      = { "b", "G", "gamma", "M", "phi", "Rs" };
-	const char *const           outputVariableNames[kOutputDistributionIndexMax]    = {
+	const char *                outputVariableNames[kOutputDistributionIndexMax]    = {
 		[kOutputDistributionIndexSigma] = "sigmaCMpa",
+	};
+	const char *                outputVariableDescriptions[kOutputDistributionIndexMax] = {
+		[kOutputDistributionIndexSigma] = "Cutting stress (sigma_c) in MPa",
 	};
 	kOutputVariableTypeIndex    outputVariableTypes[kOutputDistributionIndexMax] = {
 		[kOutputDistributionIndexSigma] = kOutputVariableTypeDistribution,
@@ -145,6 +148,8 @@ main(int argc, char *  argv[])
 		/*
 		 *	If not doing UxHw version, then approximate the cost of the third phase of
 		 *	Monte Carlo (post-processing), by calculating the mean and variance.
+		 *	For scalar outputs, the kernel has already written the correct value to
+		 *	`outputVariables[outputSelect]`. This demo has no scalar outputs so this branch is always executed in Monte Carlo mode.
 		 */
 		if (!isSelectedOutputScalar)
 		{
@@ -203,7 +208,7 @@ main(int argc, char *  argv[])
 				&printArguments,
 				monteCarloOutputSamples,
 				outputVariables,
-				outputVariableNames,
+				outputVariableDescriptions,
 				kOutputDistributionIndexMax,
 				applicationDescription
 			);
@@ -213,7 +218,14 @@ main(int argc, char *  argv[])
 		 */
 		else
 		{
-			printf("Cutting stress (σc) = %le MPa\n", outputVariables[kOutputDistributionIndexSigma]);
+			printHumanConsumableOutput(
+				&printArguments,
+				kOutputDistributionIndexMax,
+				outputVariables,
+				outputVariableNames,
+				outputVariableDescriptions,
+				monteCarloOutputSamples
+			);
 		}
 
 		/*

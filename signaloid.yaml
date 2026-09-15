@@ -1,4 +1,5 @@
 MinimumCore:
+      Class: C0Pro
       Microarchitecture: Athens
       CorrelationTracking: Autocorrelation
       MemorySize: 256000
@@ -13,7 +14,7 @@ BenchmarkingVariables:
     - VariableName: outputVariables[0]
       VariableDescription: Cutting stress
       OutputObject: Distribution
-      CommandLineArguments: " "
+      CommandLineArguments: -S 0
 
 BenchmarkingAllOutputs:
-    - CommandLineArguments: " "
+    - CommandLineArguments: -S 0

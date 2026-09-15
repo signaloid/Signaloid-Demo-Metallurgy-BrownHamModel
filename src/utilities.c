@@ -42,6 +42,7 @@ printUsage(void)
 	fprintf(
 		stderr,
 		"\t[-o, --output <Path to output CSV file : str>] (Specify the output file.)\n"
+		"\t[-S, --select-output <output : int (Default: %d)>] (Compute 0-indexed output. Calculate all possible outputs if equal to %d.)\n"
 		"\t[-M, --multiple-executions <Number of executions : int> (Default: 1)] (Repeated execute kernel for benchmarking.)\n"
 		"\t[-T, --time] (Timing mode: Times and prints the timing of the kernel execution.)\n"
 		"\t[-v, --verbose] (Verbose mode: Prints extra information about demo execution.)\n"
@@ -56,6 +57,8 @@ printUsage(void)
 		"\t[-G, --shear-modulus <G: double> (Default: Uniform(%"SignaloidParticleModifier".1le, %"SignaloidParticleModifier".1le))] (Set `G` variable.)\n"
 		"\t[-B, --burgers-vector <b: double> (Default: %"SignaloidParticleModifier".2le)] (Set `b` variable.)\n"
 		"\t[-m, --taylor-factor <M: double> (Default: Uniform(%"SignaloidParticleModifier".1lf, %"SignaloidParticleModifier".1lf))] (Set `M` variable.)\n",
+		kOutputDistributionIndexMax,
+		kOutputDistributionIndexMax,
 		kDemoSpecificConstantGammaUniformMin,
 		kDemoSpecificConstantGammaUniformMax,
 		kDemoSpecificConstantPhiUniformMin,
@@ -162,11 +165,41 @@ getCommandLineArguments(int argc, char *  argv[], CommandLineArguments *  argume
 		exit(EXIT_SUCCESS);
 	}
 
-	if (arguments->common.isOutputSelected)
+	/*
+	 *	If no output was selected on the command line, default to selecting
+	 *	all outputs.
+	 */
+	if (!arguments->common.isOutputSelected)
 	{
-		fprintf(stderr, "Error: Output select option not supported.\n");
+		arguments->common.outputSelect = kOutputDistributionIndexMax;
+	}
+
+	/*
+	 *	The selected output can never be greater than `kOutputDistributionIndexMax`.
+	 */
+	if (arguments->common.outputSelect > kOutputDistributionIndexMax)
+	{
+		fprintf(
+			stderr,
+			"Error: Output select value (-S option) is greater than the number of outputs: Provided %zu. Max: %d\n",
+			arguments->common.outputSelect,
+			kOutputDistributionIndexMax
+		);
 
 		return kCommonConstantReturnTypeError;
+	}
+	/*
+	 *	When `outputSelect` is equal to `kOutputDistributionIndexMax`, all outputs
+	 *	are selected, so we cannot be in benchmarking mode or Monte Carlo mode.
+	 */
+	else if (arguments->common.outputSelect == kOutputDistributionIndexMax)
+	{
+		if (arguments->common.isBenchmarkingMode || arguments->common.isMonteCarloMode)
+		{
+			fprintf(stderr, "Error: Please select a single output when in benchmarking mode or Monte Carlo mode.\n");
+
+			return kCommonConstantReturnTypeError;
+		}
 	}
 
 	if (arguments->common.isInputFromFileEnabled && arguments->common.isMonteCarloMode)
